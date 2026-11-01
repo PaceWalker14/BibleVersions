@@ -43,21 +43,6 @@ flowchart LR
 
 Browsers without scroll-driven animations get a simpler layout through `@supports`: one Bible per screen down the page, with the same detail panels.
 
-## Getting started
-
-You need a Chromium-based browser (Chrome, Edge, Opera or Brave), version 135 or newer, for the full 3D ring. There's nothing to install or build.
-
-```bash
-git clone https://github.com/PaceWalker14/BibleVersions.git
-cd BibleVersions
-```
-
-Open `index.html` in your browser, or serve the folder and visit http://localhost:8000:
-
-```bash
-python -m http.server 8000
-```
-
 ## Roadmap and known limitations
 
 - The full ring needs Chromium 135 or newer. Firefox gets the one-Bible-per-screen layout, and Safari hasn't been tested.
