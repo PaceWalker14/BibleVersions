@@ -2,7 +2,7 @@
 
 A 3D ring of the seven most popular English Bible translations. Scroll or swipe to turn it, then open any Bible to compare its history, strengths and weaknesses. Built with HTML and CSS, plus about 20 lines of JavaScript for one effect.
 
-![The ring of seven Bibles with the NIV in front on a glowing pedestal, a pink wave flowing behind them and the translation slider underneath](docs/screenshot.png)
+![The ring of seven Bibles with the NIV in front on a glowing pedestal, a pink wave flowing behind them and the translation slider underneath](.github/screenshot.png)
 
 ## Why I built it
 
