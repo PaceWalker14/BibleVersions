@@ -219,6 +219,62 @@ button { font: inherit; color: inherit; }
   100% { translate: 0 calc(-100vh - var(--s) * 3); }
 }
 
+/* a glowing pink wave behind the Bibles; the ring section further down
+   makes it flow sideways as you scroll */
+.wave {
+  --fade: 14%;   /* fades in this far from each side */
+  position: absolute;
+  inset: calc(var(--stage-y) - 90 * var(--bu)) 0 auto;
+  height: calc(180 * var(--bu));
+  opacity: calc(1 - var(--hide) * .6);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent);
+}
+
+/* each line is one wavelength of SVG, repeated sideways. The strip is one
+   wavelength wider than the screen, so 50% starts a wave in the middle of
+   the screen at any width; --phase then sets where the waves sit at the start */
+.wave::before,
+.wave::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: calc(100% + var(--tile-w));
+  background-repeat: repeat-x;
+  background-size: var(--tile-w) 100%;
+  background-position: calc(50% + var(--phase)) 0;
+}
+
+/* the bright line, with a crest just left of the front Bible at the start */
+.wave::before {
+  --tile-w: calc(360 * var(--bu));
+  --speed: calc(70 * var(--bu));   /* how far it flows per Bible */
+  --phase: calc(144 * var(--bu));
+  top: 0;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 300' fill='none' stroke-linecap='round'%3E%3Cdefs%3E%3Cpath id='w' d='M-600,150 c127.3,-106.7 172.7,-106.7 300,0 s172.7,106.7 300,0 s172.7,-106.7 300,0 s172.7,106.7 300,0 s172.7,-106.7 300,0 s172.7,106.7 300,0'/%3E%3Cfilter id='a' x='-600' y='0' width='1800' height='300' filterUnits='userSpaceOnUse'%3E%3CfeGaussianBlur stdDeviation='14'/%3E%3C/filter%3E%3Cfilter id='b' x='-600' y='0' width='1800' height='300' filterUnits='userSpaceOnUse'%3E%3CfeGaussianBlur stdDeviation='5'/%3E%3C/filter%3E%3C/defs%3E%3Cuse href='%23w' stroke='%23ff8fc8' stroke-width='26' filter='url%28%23a%29'/%3E%3Cuse href='%23w' stroke='%23ffb8d9' stroke-width='6' filter='url%28%23b%29'/%3E%3Cuse href='%23w' stroke='%23ffe2f0' stroke-width='1.4'/%3E%3C/svg%3E");
+}
+
+/* a fainter line that flows slower, so it looks further back */
+.wave::after {
+  --tile-w: calc(250 * var(--bu));
+  --speed: calc(42 * var(--bu));
+  --phase: calc(-126 * var(--bu));
+  top: calc(27.5 * var(--bu));
+  height: calc(125 * var(--bu));
+  opacity: .55;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 300' fill='none' stroke-linecap='round'%3E%3Cdefs%3E%3Cpath id='w' d='M-600,150 c127.3,-106.7 172.7,-106.7 300,0 s172.7,106.7 300,0 s172.7,-106.7 300,0 s172.7,106.7 300,0 s172.7,-106.7 300,0 s172.7,106.7 300,0'/%3E%3Cfilter id='b' x='-600' y='0' width='1800' height='300' filterUnits='userSpaceOnUse'%3E%3CfeGaussianBlur stdDeviation='4'/%3E%3C/filter%3E%3C/defs%3E%3Cuse href='%23w' stroke='%23ffb8d9' stroke-width='4' filter='url%28%23b%29'/%3E%3Cuse href='%23w' stroke='%23ffd6ea' stroke-width='1.1'/%3E%3C/svg%3E");
+}
+
+/* phones and tablets held upright: the Bibles fill the width, so the wave
+   runs higher, over their tops, and fades in nearer the edges */
+@media (orientation: portrait) {
+  .wave {
+    --fade: 4%;
+    top: calc(var(--stage-y) - 116 * var(--bu));
+  }
+}
+
 
 /* ---------- Header ---------- */
 
@@ -1077,6 +1133,14 @@ html:has(.panel:popover-open) .spectrum { opacity: 0; pointer-events: none; }
   /* only the front Bible's caption can be clicked or tabbed to */
   @container style(--cur: 0) {
     .caption { visibility: hidden; }
+  }
+
+  /* the pink wave flows sideways with the ring (mod() keeps it within one
+     wavelength, which looks the same because the lines repeat) */
+  .wave::before,
+  .wave::after {
+    translate: calc(mod(var(--p) * var(--speed), var(--tile-w)) * -1) 0;
+    will-change: translate;
   }
 
   /* previous / next arrows: the browser's own scroll buttons, so they always step one cell */
