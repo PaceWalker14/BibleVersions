@@ -1,0 +1,820 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <!-- minimum-scale=1 stops phones zooming out to fit the extra-wide scroll area -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#140b33">
+  <title>Bible Versions — Explore English Translations</title>
+  <meta name="description" content="Scroll or swipe through the seven most popular English Bible translations in 3D — from the word-for-word NASB to the easy-reading NLT — and compare their history, strengths and weaknesses.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='7' y='3' width='18' height='26' rx='2.5' fill='%233a2380'/%3E%3Crect x='14.6' y='8' width='2.8' height='13' fill='%23ffb8d9'/%3E%3Crect x='11' y='11.2' width='10' height='2.8' fill='%2390dcff'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Fraunces:ital,wght@0,800;1,700;1,900&family=Inter:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/bibles.css">
+  <script src="js/follow-mouse.js" defer></script>
+</head>
+<body>
+
+  <div class="backdrop" aria-hidden="true">
+    <span class="glow glow--pink"></span>
+    <span class="glow glow--blue"></span>
+    <span class="glow glow--purple"></span>
+    <i class="bubble" style="--x: 7%;  --s: 54px; --t: 26s; --delay: -3s"></i>
+    <i class="bubble" style="--x: 19%; --s: 22px; --t: 19s; --delay: -11s"></i>
+    <i class="bubble" style="--x: 31%; --s: 36px; --t: 31s; --delay: -20s"></i>
+    <i class="bubble" style="--x: 62%; --s: 16px; --t: 17s; --delay: -6s"></i>
+    <i class="bubble" style="--x: 74%; --s: 44px; --t: 28s; --delay: -15s"></i>
+    <i class="bubble" style="--x: 86%; --s: 26px; --t: 22s; --delay: -1s"></i>
+    <i class="bubble" style="--x: 95%; --s: 64px; --t: 34s; --delay: -24s"></i>
+  </div>
+
+  <header class="topbar">
+    <div class="topbar__line" aria-hidden="true"></div>
+    <p class="counter" aria-hidden="true"><span class="counter__current"></span> / 07</p>
+    <a class="logo" href="#nasb" aria-label="Bible Versions — back to the first translation"><span>Bible</span><span>Versions</span></a>
+    <a class="pill menu-btn" href="#index"><span class="menu-btn__dots" aria-hidden="true"></span><span><span class="menu-btn__all">All </span>versions</span></a>
+  </header>
+
+  <div class="pedestal" aria-hidden="true">
+    <span class="pedestal__glow"></span>
+    <span class="pedestal__side"></span>
+    <span class="pedestal__top"></span>
+  </div>
+
+  <main>
+
+    <!-- The scroll grid: 21 full-width rows and 21 full-height columns (3 laps of the
+         7 Bibles each way). Scroll-snap stops on them, so every step up, down or sideways
+         turns the ring by exactly one Bible. Add 3 of each if you add a Bible. -->
+    <div class="snap" aria-hidden="true">
+      <div class="snap__rows"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="snap__cols"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+
+    <!-- ================= 01 · NASB ================= -->
+    <section class="slide mat-leather" id="nasb" style="--i: 0" aria-labelledby="nasb-title">
+      <div class="bible">
+        <button class="bible__hit" popovertarget="info-nasb" tabindex="-1" aria-label="Open details: New American Standard Bible"></button>
+        <span class="bible__shadow"></span>
+        <div class="bible__spin"><div class="bible__sway">
+          <div class="book edges-silver" aria-hidden="true">
+            <div class="face back skin"><span class="back__mark">NASB</span></div>
+            <div class="face spine skin spine--bands"><span class="spine__title foil">Holy Bible</span><span class="spine__abbr foil">NASB</span></div>
+            <div class="face edge edge--top"></div>
+            <div class="face edge edge--bottom"></div>
+            <div class="face edge edge--fore"></div>
+            <div class="face page">
+              <span class="page__ref">John 3:16</span>
+              <p class="page__text">For God so loved the world, that He gave His only Son, so that everyone who believes in Him will not perish, but have eternal life.</p>
+              <span class="page__abbr">NASB</span>
+            </div>
+            <i class="ribbon" style="--c: #2b2b30; --x: 30%"></i>
+            <div class="cover">
+              <div class="face cover-out skin">
+                <div class="design d-minimal">
+                  <span class="cross"></span>
+                  <span class="d-minimal__title foil">Holy Bible</span>
+                  <span class="d-minimal__rule foil-bg"></span>
+                  <span class="d-minimal__sub foil">New American Standard Bible</span>
+                </div>
+              </div>
+              <div class="face cover-in"></div>
+            </div>
+          </div>
+        </div></div>
+      </div>
+      <div class="caption">
+        <p class="caption__eyebrow">Formal equivalence</p>
+        <h2 class="caption__title" id="nasb-title">NASB</h2>
+        <p class="caption__name">New American Standard Bible</p>
+        <button class="pill caption__cta" popovertarget="info-nasb">Explore <span aria-hidden="true">→</span></button>
+        <p class="caption__hint">Scroll or swipe — up, down or sideways</p>
+      </div>
+    </section>
+
+    <!-- ================= 02 · ESV ================= -->
+    <section class="slide mat-leather" id="esv" style="--i: 1" aria-labelledby="esv-title">
+      <div class="bible">
+        <button class="bible__hit" popovertarget="info-esv" tabindex="-1" aria-label="Open details: English Standard Version"></button>
+        <span class="bible__shadow"></span>
+        <div class="bible__spin"><div class="bible__sway">
+          <div class="book edges-redgold" aria-hidden="true">
+            <div class="face back skin"><span class="back__mark">ESV</span></div>
+            <div class="face spine skin spine--bands"><span class="spine__title foil">Holy Bible</span><span class="spine__abbr foil">ESV</span></div>
+            <div class="face edge edge--top"></div>
+            <div class="face edge edge--bottom"></div>
+            <div class="face edge edge--fore"></div>
+            <div class="face page">
+              <span class="page__ref">John 3:16</span>
+              <p class="page__text">For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have eternal life.</p>
+              <span class="page__abbr">ESV</span>
+            </div>
+            <i class="ribbon" style="--c: #5b2a12; --x: 25%; --z: calc(-3 * var(--bu)); --rot: 5deg"></i>
+            <i class="ribbon" style="--c: #c9a24a; --x: 33%; --len: 19; --z: calc(2 * var(--bu)); --rot: -3deg"></i>
+            <div class="cover">
+              <div class="face cover-out skin">
+                <div class="design d-esv">
+                  <span class="cross"></span>
+                  <span class="d-esv__title foil">Holy Bible</span>
+                  <span class="d-esv__rule foil-bg"></span>
+                  <span class="d-esv__sub foil">English Standard Version</span>
+                  <span class="d-esv__mono"><span class="foil">ESV</span></span>
+                </div>
+              </div>
+              <div class="face cover-in"></div>
+            </div>
+          </div>
+        </div></div>
+      </div>
+      <div class="caption">
+        <p class="caption__eyebrow">Essentially literal</p>
+        <h2 class="caption__title" id="esv-title">ESV</h2>
+        <p class="caption__name">English Standard Version</p>
+        <button class="pill caption__cta" popovertarget="info-esv">Explore <span aria-hidden="true">→</span></button>
+      </div>
+    </section>
+
+    <!-- ================= 03 · KJV ================= -->
+    <section class="slide mat-leather" id="kjv" style="--i: 2" aria-labelledby="kjv-title">
+      <div class="bible">
+        <button class="bible__hit" popovertarget="info-kjv" tabindex="-1" aria-label="Open details: King James Version"></button>
+        <span class="bible__shadow"></span>
+        <div class="bible__spin"><div class="bible__sway">
+          <div class="book edges-gold" aria-hidden="true">
+            <div class="face back skin"><span class="back__mark">KJV</span></div>
+            <div class="face spine skin spine--bands"><span class="spine__title foil">Holy Bible</span><span class="spine__abbr foil">KJV</span></div>
+            <div class="face edge edge--top"></div>
+            <div class="face edge edge--bottom"></div>
+            <div class="face edge edge--fore"></div>
+            <div class="face page">
+              <span class="page__ref">John 3:16</span>
+              <p class="page__text">For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.</p>
+              <span class="page__abbr">KJV</span>
+            </div>
+            <i class="ribbon" style="--c: #d8b24c; --x: 24%; --z: calc(-3 * var(--bu)); --rot: 4deg"></i>
+            <i class="ribbon" style="--c: #8a1620; --x: 32%; --len: 20; --z: calc(3 * var(--bu)); --rot: -4deg"></i>
+            <div class="cover">
+              <div class="face cover-out skin">
+                <div class="design d-kjv">
+                  <span class="d-kjv__frame"></span>
+                  <span class="d-kjv__holy foil">Holy</span>
+                  <span class="d-kjv__bible foil">Bible</span>
+                  <span class="d-kjv__orn"><i class="foil-bg"></i><b class="foil-bg"></b><i class="foil-bg"></i></span>
+                  <span class="d-kjv__sub foil">King James Version</span>
+                  <span class="corner corner--top"></span>
+                  <span class="corner corner--bottom"></span>
+                </div>
+              </div>
+              <div class="face cover-in"></div>
+            </div>
+          </div>
+        </div></div>
+      </div>
+      <div class="caption">
+        <p class="caption__eyebrow">Formal equivalence</p>
+        <h2 class="caption__title" id="kjv-title">KJV</h2>
+        <p class="caption__name">King James Version</p>
+        <button class="pill caption__cta" popovertarget="info-kjv">Explore <span aria-hidden="true">→</span></button>
+      </div>
+    </section>
+
+    <!-- ================= 04 · NKJV ================= -->
+    <section class="slide mat-leather" id="nkjv" style="--i: 3" aria-labelledby="nkjv-title">
+      <div class="bible">
+        <button class="bible__hit" popovertarget="info-nkjv" tabindex="-1" aria-label="Open details: New King James Version"></button>
+        <span class="bible__shadow"></span>
+        <div class="bible__spin"><div class="bible__sway">
+          <div class="book edges-gold" aria-hidden="true">
+            <div class="face back skin"><span class="back__mark">NKJV</span></div>
+            <div class="face spine skin spine--bands"><span class="spine__title foil">Holy Bible</span><span class="spine__abbr foil">NKJV</span></div>
+            <div class="face edge edge--top"></div>
+            <div class="face edge edge--bottom"></div>
+            <div class="face edge edge--fore"></div>
+            <div class="face page">
+              <span class="page__ref">John 3:16</span>
+              <p class="page__text">For God so loved the world that He gave His only begotten Son, that whoever believes in Him should not perish but have everlasting life.</p>
+              <span class="page__abbr">NKJV</span>
+            </div>
+            <i class="ribbon" style="--c: #c9a24a; --x: 30%; --len: 18"></i>
+            <div class="cover">
+              <div class="face cover-out skin">
+                <div class="design d-nkjv">
+                  <span class="d-nkjv__arch"></span>
+                  <span class="cross"></span>
+                  <span class="d-nkjv__title foil">Holy Bible</span>
+                  <span class="d-nkjv__dots"><i></i><i></i><i></i></span>
+                  <span class="d-nkjv__sub foil">New King James Version</span>
+                  <span class="d-nkjv__abbr foil">NKJV</span>
+                </div>
+              </div>
+              <div class="face cover-in"></div>
+            </div>
+          </div>
+        </div></div>
+      </div>
+      <div class="caption">
+        <p class="caption__eyebrow">Formal equivalence</p>
+        <h2 class="caption__title" id="nkjv-title">NKJV</h2>
+        <p class="caption__name">New King James Version</p>
+        <button class="pill caption__cta" popovertarget="info-nkjv">Explore <span aria-hidden="true">→</span></button>
+      </div>
+    </section>
+
+    <!-- ================= 05 · CSB ================= -->
+    <section class="slide mat-leather" id="csb" style="--i: 4" aria-labelledby="csb-title">
+      <div class="bible">
+        <button class="bible__hit" popovertarget="info-csb" tabindex="-1" aria-label="Open details: Christian Standard Bible"></button>
+        <span class="bible__shadow"></span>
+        <div class="bible__spin"><div class="bible__sway">
+          <div class="book edges-plain" aria-hidden="true">
+            <div class="face back skin"><span class="d-csb__lower"></span><span class="back__mark">CSB</span></div>
+            <div class="face spine skin spine--bands"><span class="spine__lower"></span><span class="spine__title foil">Holy Bible</span><span class="spine__abbr foil">CSB</span></div>
+            <div class="face edge edge--top"></div>
+            <div class="face edge edge--bottom"></div>
+            <div class="face edge edge--fore"></div>
+            <div class="face page">
+              <span class="page__ref">John 3:16</span>
+              <p class="page__text">For God loved the world in this way: He gave his one and only Son, so that everyone who believes in him will not perish but have eternal life.</p>
+              <span class="page__abbr">CSB</span>
+            </div>
+            <i class="ribbon" style="--c: #1b5960; --x: 30%"></i>
+            <div class="cover">
+              <div class="face cover-out skin">
+                <div class="design d-csb">
+                  <span class="d-csb__lower"></span>
+                  <span class="d-csb__holy foil">Holy Bible</span>
+                  <span class="d-csb__abbr foil">CSB</span>
+                  <span class="d-csb__name">Christian Standard Bible</span>
+                </div>
+              </div>
+              <div class="face cover-in"></div>
+            </div>
+          </div>
+        </div></div>
+      </div>
+      <div class="caption">
+        <p class="caption__eyebrow">Optimal equivalence</p>
+        <h2 class="caption__title" id="csb-title">CSB</h2>
+        <p class="caption__name">Christian Standard Bible</p>
+        <button class="pill caption__cta" popovertarget="info-csb">Explore <span aria-hidden="true">→</span></button>
+      </div>
+    </section>
+
+    <!-- ================= 06 · NIV ================= -->
+    <section class="slide mat-leather" id="niv" style="--i: 5" aria-labelledby="niv-title">
+      <div class="bible">
+        <button class="bible__hit" popovertarget="info-niv" tabindex="-1" aria-label="Open details: New International Version"></button>
+        <span class="bible__shadow"></span>
+        <div class="bible__spin"><div class="bible__sway">
+          <div class="book edges-rose" aria-hidden="true">
+            <div class="face back skin"><span class="back__mark">NIV</span></div>
+            <div class="face spine skin spine--bands"><span class="spine__title foil">Holy Bible</span><span class="spine__abbr foil">NIV</span></div>
+            <div class="face edge edge--top"></div>
+            <div class="face edge edge--bottom"></div>
+            <div class="face edge edge--fore"></div>
+            <div class="face page">
+              <span class="page__ref">John 3:16</span>
+              <p class="page__text">For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.</p>
+              <span class="page__abbr">NIV</span>
+            </div>
+            <i class="ribbon" style="--c: #d99a8a; --x: 30%; --len: 17"></i>
+            <div class="cover">
+              <div class="face cover-out skin">
+                <div class="design d-niv">
+                  <svg class="d-niv__vine" viewBox="0 0 64 93" preserveAspectRatio="none" aria-hidden="true">
+                    <defs>
+                      <linearGradient id="rose-foil" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0" stop-color="#ffe6da"/>
+                        <stop offset=".3" stop-color="#e7a690"/>
+                        <stop offset=".55" stop-color="#95594a"/>
+                        <stop offset=".8" stop-color="#f7cbb8"/>
+                        <stop offset="1" stop-color="#c4836f"/>
+                      </linearGradient>
+                    </defs>
+                    <g fill="none" stroke="url(#rose-foil)" stroke-width=".5" stroke-linecap="round">
+                      <path d="M4 90C8 80 3 74 6 66S4 56 6 49"/>
+                      <path d="M4 90C16 86 26 92 38 87S54 84 60 76"/>
+                      <path d="M61 4C55 7 57 13 48 17"/>
+                      <path d="M57 9C59 12 59 15 57 18"/>
+                    </g>
+                    <g fill="url(#rose-foil)">
+                      <ellipse cx="7.6" cy="82.1" rx="2.4" ry=".9" transform="rotate(-35 7.6 82.1)"/>
+                      <ellipse cx="7.4" cy="76.2" rx="2.4" ry=".9" transform="rotate(-55 7.4 76.2)"/>
+                      <ellipse cx="3.4" cy="70.2" rx="2.2" ry=".85" transform="rotate(40 3.4 70.2)"/>
+                      <ellipse cx="8" cy="64.9" rx="2.4" ry=".9" transform="rotate(-40 8 64.9)"/>
+                      <ellipse cx="9" cy="59.9" rx="2.2" ry=".85" transform="rotate(-30 9 59.9)"/>
+                      <ellipse cx="8.2" cy="55.6" rx="2.2" ry=".85" transform="rotate(-50 8.2 55.6)"/>
+                      <ellipse cx="6.8" cy="46.8" rx="2" ry=".8" transform="rotate(-70 6.8 46.8)"/>
+                      <ellipse cx="17.4" cy="86.8" rx="2.4" ry=".9" transform="rotate(-40 17.4 86.8)"/>
+                      <ellipse cx="28.5" cy="87.4" rx="2.4" ry=".9" transform="rotate(-40 28.5 87.4)"/>
+                      <ellipse cx="36.5" cy="85" rx="2.2" ry=".85" transform="rotate(45 36.5 85)"/>
+                      <ellipse cx="40" cy="85.2" rx="2.4" ry=".9" transform="rotate(-35 40 85.2)"/>
+                      <ellipse cx="49.6" cy="81.9" rx="2.4" ry=".9" transform="rotate(-45 49.6 81.9)"/>
+                      <ellipse cx="56" cy="79.1" rx="2.2" ry=".85" transform="rotate(-55 56 79.1)"/>
+                      <ellipse cx="60.8" cy="73.6" rx="2" ry=".8" transform="rotate(-70 60.8 73.6)"/>
+                      <ellipse cx="55.5" cy="7.6" rx="2" ry=".8" transform="rotate(25 55.5 7.6)"/>
+                      <ellipse cx="51.5" cy="13.6" rx="2" ry=".8" transform="rotate(-25 51.5 13.6)"/>
+                      <circle cx="61" cy="75" r=".9"/>
+                      <circle cx="47.4" cy="17.2" r=".8"/>
+                      <circle cx="57" cy="18.4" r=".7"/>
+                      <circle cx="6" cy="48.6" r=".8"/>
+                    </g>
+                  </svg>
+                  <span class="d-niv__title foil">Holy Bible</span>
+                  <span class="d-niv__name foil">New International Version</span>
+                  <span class="d-niv__abbr foil">NIV</span>
+                </div>
+              </div>
+              <div class="face cover-in"></div>
+            </div>
+          </div>
+        </div></div>
+      </div>
+      <div class="caption">
+        <p class="caption__eyebrow">Balanced (word &amp; thought)</p>
+        <h2 class="caption__title" id="niv-title">NIV</h2>
+        <p class="caption__name">New International Version</p>
+        <button class="pill caption__cta" popovertarget="info-niv">Explore <span aria-hidden="true">→</span></button>
+      </div>
+    </section>
+
+    <!-- ================= 07 · NLT ================= -->
+    <section class="slide mat-cloth" id="nlt" style="--i: 6" aria-labelledby="nlt-title">
+      <div class="bible">
+        <button class="bible__hit" popovertarget="info-nlt" tabindex="-1" aria-label="Open details: New Living Translation"></button>
+        <span class="bible__shadow"></span>
+        <div class="bible__spin"><div class="bible__sway">
+          <div class="book edges-plain" aria-hidden="true">
+            <div class="face back skin"><span class="band"></span><span class="back__mark">NLT</span></div>
+            <div class="face spine skin"><span class="spine__title foil">Holy Bible</span><span class="spine__abbr foil">NLT</span></div>
+            <div class="face edge edge--top"><span class="band"></span></div>
+            <div class="face edge edge--bottom"><span class="band"></span></div>
+            <div class="face edge edge--fore"></div>
+            <div class="face page">
+              <span class="page__ref">John 3:16</span>
+              <p class="page__text">For this is how God loved the world: He gave his one and only Son, so that everyone who believes in him will not perish but have eternal life.</p>
+              <span class="page__abbr">NLT</span>
+            </div>
+            <i class="ribbon" style="--c: #2b1d0e; --x: 30%"></i>
+            <div class="cover">
+              <div class="face cover-out skin">
+                <div class="design d-nlt">
+                  <span class="d-nlt__sun"></span>
+                  <span class="d-nlt__holy">Holy</span>
+                  <span class="d-nlt__bible">Bible</span>
+                  <span class="d-nlt__rule"></span>
+                  <span class="d-nlt__name">New Living Translation</span>
+                  <span class="band"></span>
+                </div>
+              </div>
+              <div class="face cover-in"></div>
+            </div>
+          </div>
+        </div></div>
+      </div>
+      <div class="caption">
+        <p class="caption__eyebrow">Dynamic equivalence</p>
+        <h2 class="caption__title" id="nlt-title">NLT</h2>
+        <p class="caption__name">New Living Translation</p>
+        <button class="pill caption__cta" popovertarget="info-nlt">Explore <span aria-hidden="true">→</span></button>
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- ================= Translation scale (jump links) ================= -->
+  <nav class="spectrum" aria-label="Translation scale — jump to a version">
+    <div class="spectrum__track">
+      <a class="spectrum__tick" href="#nasb" style="--v: 6" data-label="NASB"><span class="sr-only">NASB</span></a>
+      <a class="spectrum__tick" href="#esv" style="--v: 18" data-label="ESV"><span class="sr-only">ESV</span></a>
+      <a class="spectrum__tick" href="#kjv" style="--v: 22" data-label="KJV"><span class="sr-only">KJV</span></a>
+      <a class="spectrum__tick" href="#nkjv" style="--v: 25" data-label="NKJV"><span class="sr-only">NKJV</span></a>
+      <a class="spectrum__tick" href="#csb" style="--v: 40" data-label="CSB"><span class="sr-only">CSB</span></a>
+      <a class="spectrum__tick" href="#niv" style="--v: 53" data-label="NIV"><span class="sr-only">NIV</span></a>
+      <a class="spectrum__tick" href="#nlt" style="--v: 72" data-label="NLT"><span class="sr-only">NLT</span></a>
+      <span class="spectrum__handle" aria-hidden="true"></span>
+    </div>
+    <div class="spectrum__labels" aria-hidden="true"><span>Word-for-word</span><span>Thought-for-thought</span><span>Paraphrase</span></div>
+  </nav>
+
+
+  <!-- ================= "All versions" overlay ================= -->
+  <nav class="index" id="index" aria-label="All translations">
+    <div class="index__inner">
+      <div class="index__head">
+        <h2>All translations</h2>
+        <a class="pill" href="#_">Close <span aria-hidden="true">✕</span></a>
+      </div>
+      <p class="index__lead">The seven most widely read English translations, ordered from the most literal (word-for-word) to the easiest to read (thought-for-thought). Pick one to jump straight to it.</p>
+      <ol class="index__list">
+        <li><a href="#nasb" style="--c: #9fdcff"><span class="index__abbr">NASB</span><span class="index__name">New American Standard Bible</span><span class="index__meta">Formal equivalence · Grade 11</span></a></li>
+        <li><a href="#esv" style="--c: #ffb8d9"><span class="index__abbr">ESV</span><span class="index__name">English Standard Version</span><span class="index__meta">Essentially literal · Grade 10</span></a></li>
+        <li><a href="#kjv" style="--c: #c9b6ff"><span class="index__abbr">KJV</span><span class="index__name">King James Version</span><span class="index__meta">Formal equivalence · Grade 12</span></a></li>
+        <li><a href="#nkjv" style="--c: #8fd0ff"><span class="index__abbr">NKJV</span><span class="index__name">New King James Version</span><span class="index__meta">Formal equivalence · Grade 9</span></a></li>
+        <li><a href="#csb" style="--c: #ffc4e1"><span class="index__abbr">CSB</span><span class="index__name">Christian Standard Bible</span><span class="index__meta">Optimal equivalence · Grade 7</span></a></li>
+        <li><a href="#niv" style="--c: #b9a4ff"><span class="index__abbr">NIV</span><span class="index__name">New International Version</span><span class="index__meta">Balanced · Grade 7–8</span></a></li>
+        <li><a href="#nlt" style="--c: #9ee8ff"><span class="index__abbr">NLT</span><span class="index__name">New Living Translation</span><span class="index__meta">Dynamic equivalence · Grade 6</span></a></li>
+      </ol>
+    </div>
+  </nav>
+
+
+  <!-- ================= Detail panels (open when a Bible is clicked) ================= -->
+
+  <aside class="panel" id="info-nasb" popover aria-labelledby="info-nasb-title" style="--c: #9fdcff">
+    <button class="pill panel__close" popovertarget="info-nasb" popovertargetaction="hide">Close <span aria-hidden="true">✕</span></button>
+    <div class="panel__inner">
+      <p class="panel__eyebrow">01 / 07 · Formal equivalence</p>
+      <h2 class="panel__title" id="info-nasb-title">NASB</h2>
+      <p class="panel__name">New American Standard Bible</p>
+      <p class="panel__tagline">The word-for-word workhorse of serious Bible study.</p>
+      <dl class="facts">
+        <div><dt>First published</dt><dd>1971 (NT 1963)</dd></div>
+        <div><dt>Revisions</dt><dd>1995, 2020</dd></div>
+        <div><dt>Publisher</dt><dd>The Lockman Foundation</dd></div>
+        <div><dt>Reading level</dt><dd>Grade 11</dd></div>
+        <div class="wide"><dt>Old Testament source</dt><dd>Masoretic Text (Biblia Hebraica Stuttgartensia)</dd></div>
+        <div class="wide"><dt>New Testament source</dt><dd>Critical Greek text (Nestle-Aland)</dd></div>
+      </dl>
+      <section class="block">
+        <h3>Translation approach</h3>
+        <div class="meter" style="--v: 6" role="img" aria-label="Very close to the word-for-word end of the scale"><span></span></div>
+        <div class="meter__labels" aria-hidden="true"><span>Word-for-word</span><span>Thought-for-thought</span><span>Paraphrase</span></div>
+        <p>Follows the Hebrew and Greek as closely as English grammar allows — word order, verb tenses and repeated words are kept wherever possible, and words the translators added for sense are set in italics.</p>
+      </section>
+      <section class="block">
+        <h3>John 3:16</h3>
+        <blockquote class="verse"><p>For God so loved the world, that He gave His only Son, so that everyone who believes in Him will not perish, but have eternal life.</p></blockquote>
+      </section>
+      <div class="proscons">
+        <section class="block">
+          <h3>Advantages</h3>
+          <ul class="list list--pros">
+            <li>Very precise — ideal for word studies and comparing with the original languages</li>
+            <li>Consistent: the same Greek or Hebrew word is usually rendered by the same English word</li>
+            <li>Italics show exactly which words the translators supplied</li>
+            <li>Capitalises pronouns that refer to God, which helps in tricky passages</li>
+          </ul>
+        </section>
+        <section class="block">
+          <h3>Disadvantages</h3>
+          <ul class="list list--cons">
+            <li>Wooden, choppy English in places — hard to read aloud</li>
+            <li>Literal idioms can obscure the meaning for newer readers</li>
+            <li>Less suited to reading long sections in one sitting</li>
+          </ul>
+        </section>
+      </div>
+      <section class="block">
+        <h3>Best for</h3>
+        <ul class="chips"><li>Deep study</li><li>Word studies</li><li>Sermon prep</li></ul>
+      </section>
+      <section class="block fact">
+        <h3>Did you know?</h3>
+        <p>The NASB began as an update of the 1901 American Standard Version, which was itself a revision of the King James Version.</p>
+      </section>
+      <p class="panel__note">Reading levels and positions on the translation scale are approximate — published charts vary.</p>
+    </div>
+  </aside>
+
+  <aside class="panel" id="info-esv" popover aria-labelledby="info-esv-title" style="--c: #ffb8d9">
+    <button class="pill panel__close" popovertarget="info-esv" popovertargetaction="hide">Close <span aria-hidden="true">✕</span></button>
+    <div class="panel__inner">
+      <p class="panel__eyebrow">02 / 07 · Essentially literal</p>
+      <h2 class="panel__title" id="info-esv-title">ESV</h2>
+      <p class="panel__name">English Standard Version</p>
+      <p class="panel__tagline">Essentially literal, with a literary ear.</p>
+      <dl class="facts">
+        <div><dt>First published</dt><dd>2001</dd></div>
+        <div><dt>Revisions</dt><dd>2007, 2011, 2016</dd></div>
+        <div><dt>Publisher</dt><dd>Crossway</dd></div>
+        <div><dt>Reading level</dt><dd>Grade 10</dd></div>
+        <div class="wide"><dt>Old Testament source</dt><dd>Masoretic Text (Biblia Hebraica Stuttgartensia)</dd></div>
+        <div class="wide"><dt>New Testament source</dt><dd>Critical Greek text (UBS / Nestle-Aland)</dd></div>
+      </dl>
+      <section class="block">
+        <h3>Translation approach</h3>
+        <div class="meter" style="--v: 18" role="img" aria-label="Toward the word-for-word end of the scale"><span></span></div>
+        <div class="meter__labels" aria-hidden="true"><span>Word-for-word</span><span>Thought-for-thought</span><span>Paraphrase</span></div>
+        <p>Aims to be “as literal as possible” while keeping natural, dignified English. Built on the 1971 Revised Standard Version and revised by a team of more than 100 people.</p>
+      </section>
+      <section class="block">
+        <h3>John 3:16</h3>
+        <blockquote class="verse"><p>For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have eternal life.</p></blockquote>
+      </section>
+      <div class="proscons">
+        <section class="block">
+          <h3>Advantages</h3>
+          <ul class="list list--pros">
+            <li>A strong balance of accuracy and readability</li>
+            <li>Elegant, traditional phrasing that works well for memorisation and public reading</li>
+            <li>Huge range of editions and study tools, including the ESV Study Bible</li>
+            <li>Keeps key theological terms like “propitiation” and “justification”</li>
+          </ul>
+        </section>
+        <section class="block">
+          <h3>Disadvantages</h3>
+          <ul class="list list--cons">
+            <li>Keeps some awkward or old-fashioned word order inherited from the RSV</li>
+            <li>Less natural for children and new readers than the NIV or NLT</li>
+            <li>Often keeps masculine wording (“brothers”, “man”) and moves inclusive meanings to footnotes</li>
+          </ul>
+        </section>
+      </div>
+      <section class="block">
+        <h3>Best for</h3>
+        <ul class="chips"><li>Study &amp; teaching</li><li>Memorisation</li><li>Church reading</li></ul>
+      </section>
+      <section class="block fact">
+        <h3>Did you know?</h3>
+        <p>The ESV’s family tree runs back through the RSV (1952), the American Standard Version (1901) and the English Revised Version (1885) to the King James Version.</p>
+      </section>
+      <p class="panel__note">Reading levels and positions on the translation scale are approximate — published charts vary.</p>
+    </div>
+  </aside>
+
+  <aside class="panel" id="info-kjv" popover aria-labelledby="info-kjv-title" style="--c: #c9b6ff">
+    <button class="pill panel__close" popovertarget="info-kjv" popovertargetaction="hide">Close <span aria-hidden="true">✕</span></button>
+    <div class="panel__inner">
+      <p class="panel__eyebrow">03 / 07 · Formal equivalence</p>
+      <h2 class="panel__title" id="info-kjv-title">KJV</h2>
+      <p class="panel__name">King James Version</p>
+      <p class="panel__tagline">The 1611 classic that shaped the English language.</p>
+      <dl class="facts">
+        <div><dt>First published</dt><dd>1611</dd></div>
+        <div><dt>Revisions</dt><dd>1769 (the standard text used today)</dd></div>
+        <div class="wide"><dt>Commissioned by</dt><dd>King James I of England</dd></div>
+        <div class="wide"><dt>Reading level</dt><dd>Grade 12</dd></div>
+        <div class="wide"><dt>Old Testament source</dt><dd>Masoretic Text (Bomberg Rabbinic Bible)</dd></div>
+        <div class="wide"><dt>New Testament source</dt><dd>Textus Receptus</dd></div>
+      </dl>
+      <section class="block">
+        <h3>Translation approach</h3>
+        <div class="meter" style="--v: 22" role="img" aria-label="Toward the word-for-word end of the scale"><span></span></div>
+        <div class="meter__labels" aria-hidden="true"><span>Word-for-word</span><span>Thought-for-thought</span><span>Paraphrase</span></div>
+        <p>A word-for-word translation made by about 47 scholars working in six companies at Westminster, Oxford and Cambridge, building heavily on earlier English Bibles such as Tyndale’s.</p>
+      </section>
+      <section class="block">
+        <h3>John 3:16</h3>
+        <blockquote class="verse"><p>For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.</p></blockquote>
+      </section>
+      <div class="proscons">
+        <section class="block">
+          <h3>Advantages</h3>
+          <ul class="list list--pros">
+            <li>Majestic, rhythmic language that is memorable and beautiful read aloud</li>
+            <li>Enormous historical and cultural influence — quoted in literature, music and everyday speech</li>
+            <li>Public domain (outside the UK), so it is free to copy and share</li>
+            <li>The wording many people already know by heart</li>
+          </ul>
+        </section>
+        <section class="block">
+          <h3>Disadvantages</h3>
+          <ul class="list list--cons">
+            <li>Archaic English (“thee”, “thou”, “-eth”) can be hard to follow</li>
+            <li>Some words have changed meaning — “let” once meant “hinder”, “conversation” meant “conduct”</li>
+            <li>Based on later Greek manuscripts; a few verses (e.g. 1 John 5:7–8) contain words missing from the earliest copies</li>
+          </ul>
+        </section>
+      </div>
+      <section class="block">
+        <h3>Best for</h3>
+        <ul class="chips"><li>Literary reading</li><li>Memorisation</li><li>Traditional worship</li></ul>
+      </section>
+      <section class="block fact">
+        <h3>Did you know?</h3>
+        <p>Linguist David Crystal counted 257 everyday English idioms that come from it — from “the powers that be” to “by the skin of your teeth”.</p>
+      </section>
+      <p class="panel__note">Reading levels and positions on the translation scale are approximate — published charts vary.</p>
+    </div>
+  </aside>
+
+  <aside class="panel" id="info-nkjv" popover aria-labelledby="info-nkjv-title" style="--c: #8fd0ff">
+    <button class="pill panel__close" popovertarget="info-nkjv" popovertargetaction="hide">Close <span aria-hidden="true">✕</span></button>
+    <div class="panel__inner">
+      <p class="panel__eyebrow">04 / 07 · Formal equivalence</p>
+      <h2 class="panel__title" id="info-nkjv-title">NKJV</h2>
+      <p class="panel__name">New King James Version</p>
+      <p class="panel__tagline">The King James tradition in modern English.</p>
+      <dl class="facts">
+        <div><dt>First published</dt><dd>1982 (NT 1979)</dd></div>
+        <div><dt>Publisher</dt><dd>Thomas Nelson</dd></div>
+        <div class="wide"><dt>Reading level</dt><dd>Grade 9</dd></div>
+        <div class="wide"><dt>Old Testament source</dt><dd>Masoretic Text (Biblia Hebraica Stuttgartensia)</dd></div>
+        <div class="wide"><dt>New Testament source</dt><dd>Textus Receptus, with footnotes for other manuscript traditions</dd></div>
+      </dl>
+      <section class="block">
+        <h3>Translation approach</h3>
+        <div class="meter" style="--v: 25" role="img" aria-label="Toward the word-for-word end of the scale"><span></span></div>
+        <div class="meter__labels" aria-hidden="true"><span>Word-for-word</span><span>Thought-for-thought</span><span>Paraphrase</span></div>
+        <p>Updates the KJV’s vocabulary and grammar while keeping its sentence structure and textual base. Footnotes flag where the modern critical (NU) and Majority (M) Greek texts differ.</p>
+      </section>
+      <section class="block">
+        <h3>John 3:16</h3>
+        <blockquote class="verse"><p>For God so loved the world that He gave His only begotten Son, that whoever believes in Him should not perish but have everlasting life.</p></blockquote>
+      </section>
+      <div class="proscons">
+        <section class="block">
+          <h3>Advantages</h3>
+          <ul class="list list--pros">
+            <li>The familiar KJV cadence without “thee” and “thou”</li>
+            <li>Literal and dependable for study</li>
+            <li>Footnotes show textual differences openly</li>
+            <li>A natural bridge for readers who grew up with the KJV</li>
+          </ul>
+        </section>
+        <section class="block">
+          <h3>Disadvantages</h3>
+          <ul class="list list--cons">
+            <li>Sentence structure can still feel formal and old-fashioned</li>
+            <li>Uses the Textus Receptus rather than the earliest manuscripts for its main text</li>
+            <li>Harder for children and new believers than dynamic translations</li>
+          </ul>
+        </section>
+      </div>
+      <section class="block">
+        <h3>Best for</h3>
+        <ul class="chips"><li>KJV lovers</li><li>Study</li><li>Preaching</li></ul>
+      </section>
+      <section class="block fact">
+        <h3>Did you know?</h3>
+        <p>More than 130 scholars, church leaders and lay Christians worked on it for seven years — and unlike the 1611 KJV, it capitalises pronouns that refer to God.</p>
+      </section>
+      <p class="panel__note">Reading levels and positions on the translation scale are approximate — published charts vary.</p>
+    </div>
+  </aside>
+
+  <aside class="panel" id="info-csb" popover aria-labelledby="info-csb-title" style="--c: #ffc4e1">
+    <button class="pill panel__close" popovertarget="info-csb" popovertargetaction="hide">Close <span aria-hidden="true">✕</span></button>
+    <div class="panel__inner">
+      <p class="panel__eyebrow">05 / 07 · Optimal equivalence</p>
+      <h2 class="panel__title" id="info-csb-title">CSB</h2>
+      <p class="panel__name">Christian Standard Bible</p>
+      <p class="panel__tagline">Optimal equivalence: faithful and highly readable.</p>
+      <dl class="facts">
+        <div><dt>First published</dt><dd>2017</dd></div>
+        <div><dt>Based on</dt><dd>The HCSB (2004)</dd></div>
+        <div><dt>Publisher</dt><dd>Holman Bible Publishers</dd></div>
+        <div><dt>Reading level</dt><dd>Grade 7</dd></div>
+        <div class="wide"><dt>Old Testament source</dt><dd>Masoretic Text (Biblia Hebraica Stuttgartensia)</dd></div>
+        <div class="wide"><dt>New Testament source</dt><dd>Critical Greek text (Nestle-Aland 28 / UBS 5)</dd></div>
+      </dl>
+      <section class="block">
+        <h3>Translation approach</h3>
+        <div class="meter" style="--v: 40" role="img" aria-label="Just on the word-for-word side of the middle of the scale"><span></span></div>
+        <div class="meter__labels" aria-hidden="true"><span>Word-for-word</span><span>Thought-for-thought</span><span>Paraphrase</span></div>
+        <p>Uses “optimal equivalence”: a literal rendering whenever it reads clearly in English, and a more dynamic one only when a literal phrase would hide the meaning.</p>
+      </section>
+      <section class="block">
+        <h3>John 3:16</h3>
+        <blockquote class="verse"><p>For God loved the world in this way: He gave his one and only Son, so that everyone who believes in him will not perish but have eternal life.</p></blockquote>
+      </section>
+      <div class="proscons">
+        <section class="block">
+          <h3>Advantages</h3>
+          <ul class="list list--pros">
+            <li>Excellent balance — easy to read yet faithful to the original</li>
+            <li>Clear, modern English that reads aloud well</li>
+            <li>Keeps key theological terms while smoothing awkward idioms</li>
+            <li>Translated by scholars from many denominations</li>
+          </ul>
+        </section>
+        <section class="block">
+          <h3>Disadvantages</h3>
+          <ul class="list list--cons">
+            <li>Newer, so fewer commentaries and study resources are keyed to it</li>
+            <li>Occasional freer renderings can frustrate detailed word study</li>
+            <li>Wording is less familiar when reading alongside older translations</li>
+          </ul>
+        </section>
+      </div>
+      <section class="block">
+        <h3>Best for</h3>
+        <ul class="chips"><li>Everyday reading</li><li>Small groups</li><li>Teens &amp; new readers</li></ul>
+      </section>
+      <section class="block fact">
+        <h3>Did you know?</h3>
+        <p>Its predecessor, the HCSB, often printed God’s name as “Yahweh”; the CSB switched almost all of those back to “the LORD”.</p>
+      </section>
+      <p class="panel__note">Reading levels and positions on the translation scale are approximate — published charts vary.</p>
+    </div>
+  </aside>
+
+  <aside class="panel" id="info-niv" popover aria-labelledby="info-niv-title" style="--c: #b9a4ff">
+    <button class="pill panel__close" popovertarget="info-niv" popovertargetaction="hide">Close <span aria-hidden="true">✕</span></button>
+    <div class="panel__inner">
+      <p class="panel__eyebrow">06 / 07 · Balanced (word &amp; thought)</p>
+      <h2 class="panel__title" id="info-niv-title">NIV</h2>
+      <p class="panel__name">New International Version</p>
+      <p class="panel__tagline">The balanced, best-selling modern translation.</p>
+      <dl class="facts">
+        <div><dt>First published</dt><dd>1978 (NT 1973)</dd></div>
+        <div><dt>Revisions</dt><dd>1984, 2011</dd></div>
+        <div><dt>Publisher</dt><dd>Biblica · Zondervan</dd></div>
+        <div><dt>Reading level</dt><dd>Grade 7–8</dd></div>
+        <div class="wide"><dt>Old Testament source</dt><dd>Masoretic Text (Biblia Hebraica Stuttgartensia), with other ancient sources</dd></div>
+        <div class="wide"><dt>New Testament source</dt><dd>Eclectic critical Greek text</dd></div>
+      </dl>
+      <section class="block">
+        <h3>Translation approach</h3>
+        <div class="meter" style="--v: 53" role="img" aria-label="Near the middle of the scale"><span></span></div>
+        <div class="meter__labels" aria-hidden="true"><span>Word-for-word</span><span>Thought-for-thought</span><span>Paraphrase</span></div>
+        <p>Balances word-for-word accuracy with thought-for-thought clarity, aiming for natural contemporary English. It is kept up to date by the independent Committee on Bible Translation.</p>
+      </section>
+      <section class="block">
+        <h3>John 3:16</h3>
+        <blockquote class="verse"><p>For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.</p></blockquote>
+      </section>
+      <div class="proscons">
+        <section class="block">
+          <h3>Advantages</h3>
+          <ul class="list list--pros">
+            <li>Very readable while staying faithful to the original meaning</li>
+            <li>One of the most widely used translations — a huge range of editions, apps and resources</li>
+            <li>Great for public reading, small groups and new believers</li>
+            <li>Regularly updated to reflect scholarship and changes in English</li>
+          </ul>
+        </section>
+        <section class="block">
+          <h3>Disadvantages</h3>
+          <ul class="list list--cons">
+            <li>Interprets more than literal translations, so it is less precise for word study</li>
+            <li>The 2011 update’s gender-inclusive choices are still debated</li>
+            <li>Smooths over some repeated words and wordplay in the original</li>
+          </ul>
+        </section>
+      </div>
+      <section class="block">
+        <h3>Best for</h3>
+        <ul class="chips"><li>Everyday reading</li><li>Church &amp; groups</li><li>New believers</li></ul>
+      </section>
+      <section class="block fact">
+        <h3>Did you know?</h3>
+        <p>Its original team of over 100 scholars came from several English-speaking countries and many denominations — the “International” in the name.</p>
+      </section>
+      <p class="panel__note">Reading levels and positions on the translation scale are approximate — published charts vary.</p>
+    </div>
+  </aside>
+
+  <aside class="panel" id="info-nlt" popover aria-labelledby="info-nlt-title" style="--c: #9ee8ff">
+    <button class="pill panel__close" popovertarget="info-nlt" popovertargetaction="hide">Close <span aria-hidden="true">✕</span></button>
+    <div class="panel__inner">
+      <p class="panel__eyebrow">07 / 07 · Dynamic equivalence</p>
+      <h2 class="panel__title" id="info-nlt-title">NLT</h2>
+      <p class="panel__name">New Living Translation</p>
+      <p class="panel__tagline">Thought-for-thought clarity that reads like today.</p>
+      <dl class="facts">
+        <div><dt>First published</dt><dd>1996</dd></div>
+        <div><dt>Revisions</dt><dd>2004, 2007, 2015</dd></div>
+        <div><dt>Publisher</dt><dd>Tyndale House</dd></div>
+        <div><dt>Reading level</dt><dd>Grade 6</dd></div>
+        <div class="wide"><dt>Old Testament source</dt><dd>Masoretic Text (Biblia Hebraica Stuttgartensia)</dd></div>
+        <div class="wide"><dt>New Testament source</dt><dd>Critical Greek text (UBS / Nestle-Aland)</dd></div>
+      </dl>
+      <section class="block">
+        <h3>Translation approach</h3>
+        <div class="meter" style="--v: 72" role="img" aria-label="Toward the thought-for-thought side of the scale"><span></span></div>
+        <div class="meter__labels" aria-hidden="true"><span>Word-for-word</span><span>Thought-for-thought</span><span>Paraphrase</span></div>
+        <p>Translates whole thoughts rather than individual words, asking how the original author would say it in natural English today. Produced by 90 scholars from many denominations.</p>
+      </section>
+      <section class="block">
+        <h3>John 3:16</h3>
+        <blockquote class="verse"><p>For this is how God loved the world: He gave his one and only Son, so that everyone who believes in him will not perish but have eternal life.</p></blockquote>
+      </section>
+      <div class="proscons">
+        <section class="block">
+          <h3>Advantages</h3>
+          <ul class="list list--pros">
+            <li>Extremely clear and easy to read — great for long stretches</li>
+            <li>Ideal for new believers, teens and people reading English as a second language</li>
+            <li>Explains idioms and ancient customs in plain words</li>
+            <li>Engaging for devotional and out-loud reading</li>
+          </ul>
+        </section>
+        <section class="block">
+          <h3>Disadvantages</h3>
+          <ul class="list list--cons">
+            <li>More interpretation is built into the text itself</li>
+            <li>Loses some repeated key words, imagery and wordplay</li>
+            <li>Not ideal on its own for detailed word or doctrinal study</li>
+          </ul>
+        </section>
+      </div>
+      <section class="block">
+        <h3>Best for</h3>
+        <ul class="chips"><li>Devotional reading</li><li>New believers</li><li>Reading the whole Bible</li></ul>
+      </section>
+      <section class="block fact">
+        <h3>Did you know?</h3>
+        <p>It started as a revision of Kenneth Taylor’s 1971 paraphrase, The Living Bible, but grew into a fresh translation from the Hebrew and Greek.</p>
+      </section>
+      <p class="panel__note">Reading levels and positions on the translation scale are approximate — published charts vary.</p>
+    </div>
+  </aside>
+
+</body>
+</html>

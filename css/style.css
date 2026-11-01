@@ -1,0 +1,1252 @@
+/* ============================================================
+   Bible Versions — layout, scroll carousel & info panels
+   ------------------------------------------------------------
+   HTML + CSS (js/follow-mouse.js only adds the mouse-follow):
+   • The page scrolls both ways over a grid of screen-sized cells
+     (.snap). Scroll-snap stops on every cell, so one scroll, swipe
+     or trackpad flick — up/down OR sideways — moves exactly one.
+   • Two scroll-driven animations turn the scroll position into
+     --row and --col. A step in either direction turns the ring by
+     one Bible, so the ring position is just --p = --row + --col.
+     Every Bible works out its own place on the ring from --p.
+   • Clicking a Bible (or "Explore") opens a popover panel with
+     the details; :has(:popover-open) flies that Bible forward
+     and swings its cover open.
+   • Browsers without scroll-driven animations get a simpler
+     stacked layout (everything in the @supports block is the
+     3D-ring upgrade).
+   ============================================================ */
+
+@property --row  { syntax: '<number>';  inherits: true; initial-value: 0; }
+@property --col  { syntax: '<number>';  inherits: true; initial-value: 0; }
+@property --p    { syntax: '<number>';  inherits: true; initial-value: 0; }
+@property --n    { syntax: '<integer>'; inherits: true; initial-value: 0; }
+@property --d    { syntax: '<number>';  inherits: true; initial-value: 0; }
+@property --ad   { syntax: '<number>';  inherits: true; initial-value: 0; }
+@property --near { syntax: '<number>';  inherits: true; initial-value: 0; }
+@property --cur  { syntax: '<integer>'; inherits: true; initial-value: 1; }
+@property --sel  { syntax: '<number>';  inherits: true; initial-value: 0; }
+@property --open { syntax: '<number>';  inherits: true; initial-value: 0; }
+@property --hide { syntax: '<number>';  inherits: true; initial-value: 0; }
+@property --mx   { syntax: '<number>';  inherits: true; initial-value: 0; }
+@property --my   { syntax: '<number>';  inherits: true; initial-value: 0; }
+
+:root {
+  color-scheme: dark;
+
+  /* theme: purple night, light glowing blue, baby pink */
+  --bg: #140b33;
+  --fg: #fbf7ff;
+  --muted: rgb(240 232 255 / .72);
+  --faint: rgb(240 232 255 / .5);
+  --line: rgb(255 255 255 / .14);
+  --pink: #ffb8d9;
+  --blue: #90dcff;
+  --lilac: #c4b2ff;
+  --ink: #1d0f45;
+  --glass: rgb(42 24 96 / .55);
+  --glass-edge: rgb(255 255 255 / .16);
+  --sheen: linear-gradient(115deg, var(--blue), var(--lilac) 50%, var(--pink));
+  --spectrum: linear-gradient(90deg, var(--blue), var(--lilac) 50%, var(--pink));
+
+  --f-display: 'Fraunces', Georgia, serif;
+  --f-serif: 'Cormorant Garamond', Georgia, serif;
+  --f-cinzel: 'Cinzel', 'Times New Roman', serif;
+  --f-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --gutter: clamp(16px, 3vw, 40px);
+  --ease: cubic-bezier(.2, .8, .2, 1);
+
+  --count: 7;                         /* Bibles on the ring */
+
+  /* 1 "book unit": the tallest Bible is about 102bu */
+  --bu: min(.37vh, .95vw);
+
+  /* the ring */
+  --stage-y: 41vh;                    /* where the front Bible sits */
+  --step: 20deg;                      /* angle between neighbouring Bibles */
+  --rx: max(44vw, 175 * var(--bu));   /* ring radius */
+  --ry: calc(7 * var(--bu));          /* ring tilt */
+  --rise: calc(16 * var(--bu));       /* far Bibles sit a little higher */
+  --boost: .2;                        /* the front Bible is 20% bigger */
+
+  /* detail view */
+  --panel-w: min(520px, 42vw);
+  --panel-gap: 18px;
+  --detail-s: 1.12;
+  --detail-y: 4vh;
+}
+
+@media (max-width: 700px) {
+  :root {
+    --bu: min(.36svh, .9vw);
+    --stage-y: 39svh;
+    --boost: .1;
+    --panel-w: 0px;
+    --panel-gap: 0px;
+    --detail-s: .6;
+    --detail-y: calc(36px - 19svh);
+  }
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  background: var(--bg);
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  transition: --hide .8s var(--ease), --mx .5s ease-out, --my .5s ease-out;
+}
+
+html::-webkit-scrollbar { display: none; }
+
+html:has(.panel:popover-open) { --hide: 1; }
+
+html:has(.panel:popover-open),
+html:has(.index:target) { overflow: hidden; }
+
+body {
+  margin: 0;
+  color: var(--fg);
+  font-family: var(--f-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; }
+
+button { font: inherit; color: inherit; }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+:focus-visible {
+  outline: 2px solid var(--pink);
+  outline-offset: 3px;
+}
+
+
+/* ---------- Backdrop: purple night, soft glows, drifting bubbles ---------- */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 50% at 50% 40%, rgb(150 120 255 / .2), transparent 70%),
+    radial-gradient(90% 45% at 50% 100%, rgb(255 160 215 / .2), transparent 72%),
+    linear-gradient(#0c0624 0%, #190e43 48%, #2a1765 100%);
+}
+
+/* soft beam of light from above */
+.backdrop::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -12vh;
+  width: min(70vw, 900px);
+  height: 85vh;
+  translate: -50% 0;
+  background: linear-gradient(rgb(205 228 255 / .16), rgb(205 228 255 / 0) 80%);
+  clip-path: polygon(42% 0, 58% 0, 100% 100%, 0 100%);
+  filter: blur(24px);
+}
+
+/* frame corners */
+.backdrop::after {
+  --c: rgb(255 214 236 / .4);
+  content: "";
+  position: absolute;
+  inset: calc(var(--gutter) + 64px) var(--gutter) var(--gutter);
+  background:
+    linear-gradient(var(--c), var(--c)) top left / 12px 1px,
+    linear-gradient(var(--c), var(--c)) top left / 1px 12px,
+    linear-gradient(var(--c), var(--c)) top right / 12px 1px,
+    linear-gradient(var(--c), var(--c)) top right / 1px 12px,
+    linear-gradient(var(--c), var(--c)) bottom left / 12px 1px,
+    linear-gradient(var(--c), var(--c)) bottom left / 1px 12px,
+    linear-gradient(var(--c), var(--c)) bottom right / 12px 1px,
+    linear-gradient(var(--c), var(--c)) bottom right / 1px 12px;
+  background-repeat: no-repeat;
+}
+
+.glow {
+  position: absolute;
+  width: 70vmax;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--c), transparent);
+  animation: drift 24s ease-in-out infinite alternate;
+}
+
+.glow--pink   { --c: rgb(255 140 205 / .4);  left: -30vmax; top: -32vmax; }
+.glow--blue   { --c: rgb(100 200 255 / .34); right: -32vmax; bottom: -36vmax; animation-delay: -9s; }
+.glow--purple { --c: rgb(124 92 255 / .3);   left: 50%; top: 20%; width: 60vmax; margin-left: -30vmax; animation-delay: -16s; }
+
+@keyframes drift {
+  to { translate: 6vmax 5vmax; scale: 1.12; }
+}
+
+.bubble {
+  position: absolute;
+  left: var(--x);
+  bottom: calc(var(--s) * -1.5);
+  width: var(--s);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 28%, rgb(255 255 255 / .75) 0 5%, transparent 15%),
+    radial-gradient(circle, transparent 56%, rgb(150 220 255 / .25) 72%, rgb(255 184 217 / .5) 97%, transparent 100%);
+  box-shadow: 0 0 calc(var(--s) * .5) rgb(170 200 255 / .14);
+  opacity: .55;
+  animation: rise var(--t) linear infinite;
+  animation-delay: var(--delay);
+}
+
+@keyframes rise {
+  25%  { translate: 16px -30vh; }
+  50%  { translate: -12px -60vh; }
+  75%  { translate: 14px -90vh; }
+  100% { translate: 0 calc(-100vh - var(--s) * 3); }
+}
+
+
+/* ---------- Header ---------- */
+
+.topbar {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 70;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 32px var(--gutter) 0;
+  pointer-events: none;
+}
+
+.topbar > * { pointer-events: auto; }
+
+.topbar__line {
+  position: absolute;
+  top: 16px;
+  left: var(--gutter);
+  right: var(--gutter);
+  height: 1px;
+  background: var(--line);
+  pointer-events: none;
+}
+
+.topbar__line::after {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  width: calc(100% / var(--count));
+  height: 3px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, transparent, var(--pink), var(--blue), transparent);
+  box-shadow: 0 0 12px rgb(255 184 217 / .6);
+}
+
+.counter {
+  display: none;
+  justify-self: start;
+  margin: 0;
+  font: 500 12px / 1 var(--f-sans);
+  letter-spacing: .2em;
+  color: var(--faint);
+}
+
+.logo {
+  grid-column: 2;
+  justify-self: center;
+  display: grid;
+  justify-items: center;
+  text-decoration: none;
+  font: italic 900 24px / .82 var(--f-display);
+  text-transform: uppercase;
+  text-shadow: 0 0 20px rgb(255 160 215 / .6);
+}
+
+.logo span + span {
+  margin-top: 6px;
+  font: 800 10px / 1 var(--f-sans);
+  letter-spacing: .42em;
+  text-indent: .42em;
+  color: var(--blue);
+  text-shadow: 0 0 12px rgb(144 220 255 / .7);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 18px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background:
+    linear-gradient(var(--pill-bg, var(--glass)), var(--pill-bg, var(--glass))) padding-box,
+    linear-gradient(120deg, rgb(255 184 217 / .75), rgb(196 178 255 / .3), rgb(144 220 255 / .75)) border-box;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font: 600 12px / 1 var(--f-sans);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: box-shadow .3s, translate .3s;
+}
+
+.pill:hover,
+.pill:focus-visible { box-shadow: 0 0 24px rgb(255 170 220 / .4); }
+
+.menu-btn { justify-self: end; grid-column: 3; white-space: nowrap; }
+
+.menu-btn__dots {
+  width: 10px;
+  height: 10px;
+  background: radial-gradient(circle, currentColor 1.4px, transparent 1.7px) 0 0 / 5px 5px;
+}
+
+
+/* ---------- Slides (base layout = simple stacked fallback) ---------- */
+
+/* no z-index here: the Bibles and captions must share one stacking order with the pedestal */
+main { position: relative; }
+
+.snap { display: none; }
+
+.slide {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  justify-items: center;
+  padding: 120px var(--gutter) 130px;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  transition: --sel .9s var(--ease) .3s, --open .6s var(--ease) 0s;
+}
+
+.bible {
+  position: relative;
+  align-self: center;
+  width: var(--w);
+  height: var(--h);
+  margin: calc(4 * var(--bu)) 0 calc(12 * var(--bu));
+  perspective: calc(700 * var(--bu));
+}
+
+.bible__hit {
+  position: absolute;
+  inset: -6%;
+  z-index: 3;
+  padding: 0;
+  border: 0;
+  border-radius: calc(4 * var(--bu));
+  background: none;
+  cursor: pointer;
+}
+
+.bible__hit:focus-visible {
+  outline: 1px solid rgb(255 184 217 / .5);
+  outline-offset: calc(2 * var(--bu));
+}
+
+.bible__spin,
+.bible__sway {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+
+.bible__spin {
+  z-index: 1;
+  transform: rotateX(-8deg) rotateY(22deg);
+}
+
+.bible__sway {
+  animation: sway 7s ease-in-out infinite alternate;
+  animation-delay: calc(var(--i) * -1.37s);
+}
+
+@keyframes sway {
+  from { transform: translateY(-1.2%) rotateY(-9deg) rotateX(1.5deg); }
+  to   { transform: translateY(1.2%) rotateY(9deg) rotateX(-1.5deg); }
+}
+
+.bible__shadow {
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  bottom: -13%;
+  height: 10%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(6 0 28 / .75), transparent);
+  filter: blur(4px);
+}
+
+.caption {
+  position: relative;
+  z-index: 60;
+  text-align: center;
+}
+
+.caption__eyebrow {
+  margin: 0 0 10px;
+  font: 600 11px / 1.3 var(--f-sans);
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  color: var(--pink);
+  text-shadow: 0 1px 6px rgb(20 8 50 / .9), 0 0 14px rgb(255 160 215 / .6);
+}
+
+/* gradient text is clipped to its box, so the padding (cancelled by the
+   negative margin) leaves room for italic overhangs and the J's tail */
+.caption__title {
+  margin: 0 0 -.15em;
+  padding: 0 .1em .15em;
+  font: italic 900 clamp(50px, min(7.2vw, 10.5vh), 120px) / .9 var(--f-display);
+  letter-spacing: -.01em;
+  background: linear-gradient(100deg, #fff 30%, var(--pink) 58%, var(--blue) 85%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 24px rgb(255 150 210 / .4));
+}
+
+.caption__name {
+  margin: 12px 0 0;
+  font: 600 12px / 1.4 var(--f-sans);
+  letter-spacing: .22em;
+  text-transform: uppercase;
+}
+
+.caption__cta {
+  margin-top: 16px;
+  padding: 13px 22px;
+  border: 0;
+  color: var(--ink);
+  background: var(--sheen);
+  font-weight: 700;
+  box-shadow: 0 10px 30px -8px rgb(255 160 215 / .6), inset 0 1px 0 rgb(255 255 255 / .5);
+}
+
+.caption__cta:hover,
+.caption__cta:focus-visible {
+  translate: 0 -2px;
+  box-shadow: 0 14px 36px -6px rgb(255 160 215 / .8), 0 0 30px rgb(144 220 255 / .45);
+}
+
+.caption__hint {
+  margin: 12px 0 0;
+  font: 500 10px / 1 var(--f-sans);
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.pedestal { display: none; }
+
+html:has(.panel:popover-open) .caption { visibility: hidden; }
+
+/* the see-through panel would show these behind it, so fade them out while it's open */
+.menu-btn,
+.spectrum { transition: opacity .4s; }
+
+html:has(.panel:popover-open) .menu-btn,
+html:has(.panel:popover-open) .spectrum { opacity: 0; pointer-events: none; }
+
+
+/* ---------- Spectrum slider (word-for-word ↔ thought-for-thought) ---------- */
+
+.spectrum {
+  position: fixed;
+  z-index: 62;
+  left: 50%;
+  bottom: calc(22px + env(safe-area-inset-bottom));
+  translate: -50% 0;
+  width: min(560px, 100% - 2 * var(--gutter));
+}
+
+.spectrum__track { position: relative; height: 22px; }
+
+.spectrum__track::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 4px;
+  translate: 0 -50%;
+  border-radius: 4px;
+  background: var(--spectrum);
+  box-shadow: 0 0 14px rgb(196 178 255 / .45);
+}
+
+.spectrum__tick {
+  position: absolute;
+  top: 50%;
+  left: calc(var(--v) * 1%);
+  width: 8px;
+  height: 8px;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgb(28 15 70 / .9);
+}
+
+.spectrum__tick::before { content: ""; position: absolute; inset: -9px; }
+
+.spectrum__tick::after {
+  content: attr(data-label);
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  translate: -50% 4px;
+  padding: 6px 10px;
+  border: 1px solid var(--glass-edge);
+  border-radius: 999px;
+  background: rgb(42 24 96 / .9);
+  font: 600 10px / 1 var(--f-sans);
+  letter-spacing: .12em;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s, translate .2s;
+}
+
+.spectrum__tick:hover::after,
+.spectrum__tick:focus-visible::after { opacity: 1; translate: -50% 0; }
+
+.spectrum__handle { display: none; }
+
+.spectrum__labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font: 500 10px / 1 var(--f-sans);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+@media (max-width: 520px) {
+  .backdrop::after,
+  .menu-btn__all { display: none; }
+  .menu-btn { padding: 10px 14px; letter-spacing: .12em; }
+  .spectrum__labels { font-size: 9px; letter-spacing: .06em; }
+}
+
+
+/* ---------- Info panel (popover): a floating sheet of frosted glass ---------- */
+
+.panel {
+  position: fixed;
+  inset: var(--panel-gap) var(--panel-gap) var(--panel-gap) auto;
+  width: var(--panel-w);
+  height: auto;
+  max-width: calc(100% - 2 * var(--panel-gap));
+  max-height: calc(100% - 2 * var(--panel-gap));
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--glass-edge);
+  border-radius: 32px;
+  color: var(--fg);
+  background:
+    radial-gradient(130% 55% at 100% 0%, rgb(255 184 217 / .16), transparent 62%),
+    radial-gradient(120% 50% at 0% 100%, rgb(144 220 255 / .12), transparent 62%),
+    rgb(40 22 92 / .16);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  box-shadow: 0 40px 90px -30px rgb(6 0 30 / .7), inset 0 1px 0 rgb(255 255 255 / .2);
+  overflow: hidden auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / .22) transparent;
+  translate: calc(100% + var(--panel-gap) + 40px) 0;
+  transition: translate .65s var(--ease), display .65s allow-discrete, overlay .65s allow-discrete;
+}
+
+.panel:popover-open { translate: 0 0; }
+
+@starting-style {
+  .panel:popover-open { translate: calc(100% + var(--panel-gap) + 40px) 0; }
+}
+
+.panel__close {
+  --pill-bg: rgb(48 28 108 / .94);   /* solid enough that text scrolling under it doesn't show through */
+  position: sticky;
+  top: 16px;
+  z-index: 2;
+  float: right;
+  margin: 16px 16px 0 0;
+}
+
+.panel__inner { padding: 70px clamp(22px, 3.4vw, 40px) 44px; }
+
+.panel__eyebrow {
+  margin: 0;
+  font: 600 11px / 1.4 var(--f-sans);
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--c);
+  text-shadow: 0 0 14px color-mix(in oklab, var(--c) 60%, transparent);
+}
+
+.panel__title {
+  margin: 10px 0 -.15em;
+  padding: 0 .1em .15em 0;
+  font: italic 900 clamp(58px, 7vw, 86px) / .9 var(--f-display);
+  background: linear-gradient(100deg, #fff 35%, var(--c) 80%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  width: fit-content;
+}
+
+.panel__name {
+  margin: 12px 0 0;
+  font: 600 13px / 1.4 var(--f-sans);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.panel__tagline {
+  margin: 16px 0 0;
+  font: italic 500 24px / 1.3 var(--f-serif);
+  color: var(--muted);
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 28px 0 0;
+}
+
+.facts > div {
+  padding: 14px 18px 15px;
+  border-radius: 20px;
+  background: rgb(255 255 255 / .07);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .07);
+}
+
+.facts .wide { grid-column: 1 / -1; }
+
+.facts dt {
+  font: 600 10px / 1.3 var(--f-sans);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--c);
+}
+
+.facts dd { margin: 6px 0 0; font: 500 14px / 1.45 var(--f-sans); }
+
+.block { margin-top: 30px; }
+
+.block h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+  font: 600 11px / 1.3 var(--f-sans);
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.block h3::before {
+  content: "";
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sheen);
+  box-shadow: 0 0 10px rgb(255 184 217 / .7);
+}
+
+.block p {
+  margin: 0;
+  font: 400 15px / 1.65 var(--f-sans);
+  color: rgb(246 240 255 / .86);
+}
+
+.meter {
+  position: relative;
+  height: 8px;
+  margin: 12px 0 10px;
+  border-radius: 8px;
+  background: var(--spectrum);
+  box-shadow: 0 0 16px rgb(196 178 255 / .35);
+}
+
+.meter span {
+  position: absolute;
+  top: 50%;
+  left: calc(var(--v) * 1%);
+  width: 18px;
+  height: 18px;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgb(40 22 92 / .9), 0 0 18px var(--c);
+}
+
+.meter__labels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  font: 500 10px / 1 var(--f-sans);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.verse {
+  position: relative;
+  margin: 0;
+  padding: 46px 26px 24px;
+  border-radius: 26px;
+  background: linear-gradient(135deg, rgb(255 184 217 / .15), rgb(144 220 255 / .1));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .12);
+}
+
+.verse::before {
+  content: "\201C";
+  position: absolute;
+  top: 8px;
+  left: 22px;
+  font: italic 900 60px / 1 var(--f-display);
+  background: var(--sheen);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.block .verse p { font: 500 22px / 1.45 var(--f-serif); color: var(--fg); }
+
+.proscons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.proscons .block {
+  margin: 0;
+  padding: 18px 18px 20px;
+  border-radius: 24px;
+  background: rgb(255 255 255 / .06);
+}
+
+.list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.list li {
+  position: relative;
+  padding-left: 28px;
+  font: 400 14px / 1.55 var(--f-sans);
+  color: rgb(246 240 255 / .88);
+}
+
+.list li::before {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  display: grid;
+  place-items: center;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  font: 700 10px / 1 var(--f-sans);
+}
+
+.list--pros li::before { content: "\2713"; color: var(--blue); background: rgb(144 220 255 / .18); box-shadow: 0 0 10px rgb(144 220 255 / .3); }
+.list--cons li::before { content: "\2715"; color: var(--pink); background: rgb(255 184 217 / .18); box-shadow: 0 0 10px rgb(255 184 217 / .3); }
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chips li {
+  padding: 9px 14px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--c) 16%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--c) 45%, transparent);
+  font: 500 13px / 1 var(--f-sans);
+}
+
+.fact {
+  padding: 20px 22px;
+  border-radius: 24px;
+  background:
+    radial-gradient(120% 140% at 0% 0%, color-mix(in oklab, var(--c) 22%, transparent), transparent 70%),
+    rgb(255 255 255 / .05);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / .08);
+}
+
+.panel__note {
+  margin: 36px 0 0;
+  font: 400 12px / 1.5 var(--f-sans);
+  color: var(--faint);
+}
+
+@media (max-width: 700px) {
+  .panel {
+    inset: auto 10px 10px;
+    width: auto;
+    height: 62svh;
+    max-height: none;
+    border-radius: 28px;
+    translate: 0 calc(100% + 20px);
+  }
+
+  .panel:popover-open { translate: 0 0; }
+
+  @starting-style {
+    .panel:popover-open { translate: 0 calc(100% + 20px); }
+  }
+
+  .panel__inner { padding: 28px 20px 40px; }
+}
+
+@media (max-width: 520px) {
+  .proscons { grid-template-columns: 1fr; }
+}
+
+
+/* ---------- "All versions" overlay (opens with #index) ---------- */
+
+.index {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background:
+    radial-gradient(70% 50% at 15% 0%, rgb(255 160 215 / .16), transparent 70%),
+    radial-gradient(70% 50% at 90% 100%, rgb(120 205 255 / .14), transparent 70%),
+    rgb(18 9 48 / .78);
+  backdrop-filter: blur(22px) saturate(1.3);
+  -webkit-backdrop-filter: blur(22px) saturate(1.3);
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity .35s ease, visibility 0s linear .35s;
+}
+
+.index:target {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity .35s ease;
+}
+
+.index__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 96px var(--gutter) 64px;
+}
+
+.index__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.index__head h2 {
+  margin: 0 0 -.15em;
+  padding: 0 .1em .15em 0;
+  font: italic 900 clamp(40px, 6vw, 72px) / .95 var(--f-display);
+  background: linear-gradient(100deg, #fff 35%, var(--pink) 65%, var(--blue));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.index__lead {
+  max-width: 58ch;
+  margin: 18px 0 0;
+  font: 400 15px / 1.6 var(--f-sans);
+  color: var(--muted);
+}
+
+.index__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 14px;
+  margin: 32px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.index__list a {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  height: 100%;
+  padding: 22px 22px 20px;
+  overflow: hidden;
+  border-radius: 24px;
+  background: rgb(255 255 255 / .06);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / .09);
+  text-decoration: none;
+  transition: translate .25s, box-shadow .25s, background .25s;
+}
+
+/* a soft glow in the card's corner */
+.index__list a::before {
+  content: "";
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 150px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in oklab, var(--c) 50%, transparent), transparent);
+  pointer-events: none;
+}
+
+.index__list a:hover,
+.index__list a:focus-visible {
+  translate: 0 -3px;
+  background: rgb(255 255 255 / .09);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--c) 60%, transparent), 0 12px 32px -12px color-mix(in oklab, var(--c) 70%, transparent);
+}
+
+.index__abbr { font: italic 900 34px / 1 var(--f-display); color: var(--c); }
+.index__name { font: 500 14px / 1.35 var(--f-sans); }
+
+.index__meta {
+  font: 500 11px / 1.4 var(--f-sans);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+
+/* ============================================================
+   The 3D ring — for browsers with scroll-driven animations
+   ============================================================ */
+
+@supports (animation-timeline: scroll()) and (z-index: mod(3, 2)) {
+
+  html {
+    scroll-snap-type: both mandatory;
+    overscroll-behavior: none;   /* no back/forward swipe-navigation at the edges */
+  }
+
+  :root {
+    animation: rows linear both, cols linear both;
+    animation-timeline: scroll(root block), scroll(root inline);
+    --p: calc(var(--row) + var(--col));
+    --n: mod(round(var(--p)), var(--count));   /* index of the Bible in front, 0 … 6 */
+  }
+
+  /* 3 laps each way: 21 cells → 0 … 20 */
+  @keyframes rows {
+    from { --row: 0; }
+    to   { --row: 20; }
+  }
+
+  @keyframes cols {
+    from { --col: 0; }
+    to   { --col: 20; }
+  }
+
+  /* the scrollable area: 3 × 7 screens wide and 3 × 7 screens tall */
+  main {
+    width: calc(3 * var(--count) * 100vw);
+    height: calc(3 * var(--count) * 100vh);
+    height: calc(3 * var(--count) * 100svh);
+  }
+
+  /* full-width rows snap the vertical scroll, full-height columns the sideways one */
+  .snap,
+  .snap__rows,
+  .snap__cols {
+    display: flex;
+    position: absolute;
+    inset: 0;
+  }
+
+  .snap__rows { flex-direction: column; }
+
+  .snap i { flex: none; scroll-snap-stop: always; }
+
+  .snap__rows i {
+    height: 100vh;
+    height: 100svh;
+    scroll-snap-align: start none;
+  }
+
+  .snap__cols i {
+    width: 100vw;
+    scroll-snap-align: none start;
+  }
+
+  /* Each section is just the target of its #link, parked in the middle of the
+     grid (column 7, rows 7–13); everything you see inside it is position: fixed. */
+  .slide {
+    display: block;
+    position: absolute;
+    left: calc(var(--count) * 100vw);
+    top: calc((var(--count) + var(--i)) * 100vh);
+    top: calc((var(--count) + var(--i)) * 100svh);
+    width: 100vw;
+    height: 100vh;
+    height: 100svh;
+    min-height: 0;
+    padding: 0;
+    scroll-snap-align: none;
+
+    /* distance from the front of the ring, wrapping around (-3.5 … 3.5) */
+    --d: calc(mod(var(--i) - var(--p) + var(--count) / 2, var(--count)) - var(--count) / 2);
+    --ad: max(var(--d), -1 * var(--d));
+    --near: max(0, 1 - var(--ad));
+    --cur: max(0, 1 - round(var(--ad)));   /* 1 for the Bible in front */
+  }
+
+  /* start on the first Bible, in the middle of the grid, so you can scroll either way */
+  #nasb { scroll-initial-target: nearest; }
+
+  .bible {
+    position: fixed;
+    left: 50%;
+    top: var(--stage-y);
+    z-index: calc(40 - var(--ad) * 4 + var(--sel) * 50);
+    margin: calc(var(--h) / -2) 0 0 calc(var(--w) / -2);
+
+    --a: calc(var(--d) * var(--step));
+    --away: calc(var(--hide) * (1 - var(--sel)));
+    --front: calc(1 + var(--near) * var(--boost));
+    --ring-x: calc(sin(var(--a)) * var(--rx));
+    /* the bigger front Bible grows upward, so it still stands on the pedestal */
+    --ring-y: calc(sin(var(--a)) * var(--ry) * -1 - (1 - cos(var(--a))) * var(--rise) - (var(--front) - 1) * var(--h) / 2 + var(--away) * 80vh);
+    --ring-s: calc((1 - min(var(--ad), 1) * .24 - min(var(--ad), 5) * .045) * var(--front) * (1 - var(--away) * .25));
+    --detail-x: calc((var(--panel-w) + var(--panel-gap)) / -2 + var(--w) * var(--detail-s) / 2);
+
+    translate:
+      calc(var(--ring-x) * (1 - var(--sel)) + var(--detail-x) * var(--sel))
+      calc(var(--ring-y) * (1 - var(--sel)) + var(--detail-y) * var(--sel));
+    scale: calc(var(--ring-s) * (1 - var(--sel)) + var(--detail-s) * var(--sel));
+    opacity: calc(clamp(0, (var(--count) / 2 - .05 - var(--ad)) * 3, 1) * (1 - var(--away)));
+    filter: brightness(calc(1 - min(var(--ad), 4) * .15 * (1 - var(--sel))));
+  }
+
+  /* --mx / --my come from js/follow-mouse.js: the front (or open) Bible turns toward the mouse */
+  .bible__spin {
+    --follow: calc(max(var(--near), var(--sel)) * (1 - var(--sel) * .5));
+    transform:
+      rotateX(calc(-8deg - var(--sel) * 4deg - var(--my) * 10deg * var(--follow)))
+      rotateY(calc((clamp(-50deg, var(--d) * 16deg, 50deg) + var(--near) * 22deg) * (1 - var(--sel)) + var(--sel) * 6deg + var(--mx) * 18deg * var(--follow)))
+      rotateZ(calc(var(--tilt) * min(var(--ad), 1) * (1 - var(--sel))));
+  }
+
+  /* captions sit at the bottom and slide in with their Bible */
+  .caption {
+    position: fixed;
+    left: 50%;
+    bottom: calc(clamp(90px, 11.5vh, 104px) + env(safe-area-inset-bottom));
+    z-index: calc(60 - var(--ad) * 2);
+    width: min(640px, 100% - 2 * var(--gutter));
+    translate: calc(-50% + var(--d) * 90px) 0;
+    opacity: clamp(0, 1 - var(--ad) * 2.4, 1);
+  }
+
+  /* only the front Bible's caption can be clicked or tabbed to */
+  @container style(--cur: 0) {
+    .caption { visibility: hidden; }
+  }
+
+  /* previous / next arrows: the browser's own scroll buttons, so they always step one cell */
+  html::scroll-button(left),
+  html::scroll-button(right) {
+    content: "";
+    position: fixed;
+    top: calc(var(--stage-y) + 58 * var(--bu));
+    z-index: 61;
+    width: 52px;
+    height: 52px;
+    translate: 0 -50%;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: box-shadow .3s, opacity .3s;
+  }
+
+  html::scroll-button(left) {
+    content: "" / "Previous Bible";
+    left: max(var(--gutter), 50% - 70 * var(--bu) - 70px);
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23fbf7ff'%3E%3Ccircle cx='16' cy='4' r='1.6'/%3E%3Ccircle cx='12.5' cy='8' r='1.6'/%3E%3Ccircle cx='9' cy='12' r='1.6'/%3E%3Ccircle cx='12.5' cy='16' r='1.6'/%3E%3Ccircle cx='16' cy='20' r='1.6'/%3E%3C/svg%3E") center / 22px no-repeat padding-box,
+      linear-gradient(var(--glass), var(--glass)) padding-box,
+      linear-gradient(120deg, rgb(255 184 217 / .75), rgb(144 220 255 / .75)) border-box;
+  }
+
+  html::scroll-button(right) {
+    content: "" / "Next Bible";
+    right: max(var(--gutter), 50% - 70 * var(--bu) - 70px);
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23fbf7ff'%3E%3Ccircle cx='8' cy='4' r='1.6'/%3E%3Ccircle cx='11.5' cy='8' r='1.6'/%3E%3Ccircle cx='15' cy='12' r='1.6'/%3E%3Ccircle cx='11.5' cy='16' r='1.6'/%3E%3Ccircle cx='8' cy='20' r='1.6'/%3E%3C/svg%3E") center / 22px no-repeat padding-box,
+      linear-gradient(var(--glass), var(--glass)) padding-box,
+      linear-gradient(120deg, rgb(255 184 217 / .75), rgb(144 220 255 / .75)) border-box;
+  }
+
+  html::scroll-button(left):hover,
+  html::scroll-button(right):hover,
+  html::scroll-button(left):focus-visible,
+  html::scroll-button(right):focus-visible { box-shadow: 0 0 26px rgb(255 170 220 / .5); }
+
+  html::scroll-button(left):disabled,
+  html::scroll-button(right):disabled { opacity: .3; cursor: default; }
+
+  html:has(.panel:popover-open)::scroll-button(left),
+  html:has(.panel:popover-open)::scroll-button(right) { visibility: hidden; }
+
+  /* header counter (01 / 07) and progress line */
+  .counter {
+    display: block;
+    counter-reset: current calc(var(--n) + 1);
+  }
+
+  .counter__current::before {
+    content: counter(current, decimal-leading-zero);
+    color: var(--fg);
+  }
+
+  .topbar__line::after {
+    left: calc(var(--n) / var(--count) * 100%);
+    transition: left .6s var(--ease);
+  }
+
+  /* glowing pedestal under the front Bible */
+  .pedestal {
+    display: block;
+    position: fixed;
+    z-index: 10;
+    left: 50%;
+    top: calc(var(--stage-y) + 45 * var(--bu));
+    width: min(136 * var(--bu), 94vw);
+    height: calc(42 * var(--bu));
+    translate: -50% 0;
+    opacity: calc(1 - var(--hide));
+    pointer-events: none;
+  }
+
+  .pedestal__glow {
+    position: absolute;
+    inset: -40% -35% -70%;
+    background: radial-gradient(closest-side, rgb(255 160 215 / .4), rgb(144 220 255 / .16) 55%, transparent);
+    filter: blur(10px);
+  }
+
+  .pedestal__side {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(12 * var(--bu));
+    height: calc(26 * var(--bu));
+    border-radius: 0 0 50% 50% / 0 0 calc(12 * var(--bu)) calc(12 * var(--bu));
+    background: linear-gradient(90deg, #0c0624, #2a1a5e 28%, #4a3394 50%, #231552 72%, #0c0624);
+    box-shadow: 0 calc(3 * var(--bu)) calc(12 * var(--bu)) rgb(255 150 210 / .22);
+  }
+
+  .pedestal__top {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: calc(24 * var(--bu));
+    border-radius: 50%;
+    background: radial-gradient(60% 60% at 50% 40%, #3d2b80, #160c38 72%);
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / .18),
+      inset 0 0 0 calc(3 * var(--bu)) #150b35,
+      inset 0 0 0 calc(3.5 * var(--bu)) var(--blue),
+      inset 0 0 calc(8 * var(--bu)) calc(3 * var(--bu)) rgb(144 220 255 / .3),
+      0 0 calc(4 * var(--bu)) rgb(144 220 255 / .75),
+      0 0 calc(14 * var(--bu)) rgb(255 160 215 / .4);
+  }
+
+  /* the slider handle moves to the Bible in front */
+  .spectrum__handle {
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 6%;
+    width: 18px;
+    height: 18px;
+    translate: -50% -50%;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 0 4px rgb(28 15 70 / .9), 0 0 0 6px var(--pink), 0 0 24px 4px rgb(144 220 255 / .8);
+    pointer-events: none;
+    transition: left .6s var(--ease);
+  }
+
+  /* where each Bible sits on the scale (same numbers as the ticks' --v) */
+  @container style(--n: 1) { .spectrum__handle { left: 18%; } }
+  @container style(--n: 2) { .spectrum__handle { left: 22%; } }
+  @container style(--n: 3) { .spectrum__handle { left: 25%; } }
+  @container style(--n: 4) { .spectrum__handle { left: 40%; } }
+  @container style(--n: 5) { .spectrum__handle { left: 53%; } }
+  @container style(--n: 6) { .spectrum__handle { left: 72%; } }
+
+  @media (max-width: 700px) {
+    html::scroll-button(left),
+    html::scroll-button(right) {
+      top: calc(var(--stage-y) + 74 * var(--bu));
+      width: 44px;
+      height: 44px;
+    }
+  }
+}
+
+
+/* ---------- Opening a Bible ----------
+   When a panel is open, its Bible gets --sel: 1 (fly forward)
+   and --open: 1 (swing the cover open, slightly later). */
+
+html:has(#info-nasb:popover-open) #nasb,
+html:has(#info-esv:popover-open) #esv,
+html:has(#info-kjv:popover-open) #kjv,
+html:has(#info-nkjv:popover-open) #nkjv,
+html:has(#info-csb:popover-open) #csb,
+html:has(#info-niv:popover-open) #niv,
+html:has(#info-nlt:popover-open) #nlt {
+  --sel: 1;
+  --open: 1;
+  transition-delay: 0s, .5s;
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .bible__sway,
+  .cover-out::after,
+  .glow,
+  .bubble { animation: none; }
+}
